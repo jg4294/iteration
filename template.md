@@ -9,10 +9,10 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec)) / sd(x_vec) # z-scores
 ```
 
-    ##  [1] -1.2730  1.3551 -0.1842  0.2376  0.0511 -1.1626 -0.9718  1.0458 -0.5388
-    ## [10]  0.9373 -0.6334  0.7105 -1.3405 -0.4533 -0.0518  0.9151  1.2141 -0.7673
-    ## [19]  0.1402  1.7784  1.0582 -0.8365  1.3809 -1.1224 -0.2421 -1.1595  0.4642
-    ## [28]  1.0744 -1.9997  0.3739
+    ##  [1] -0.6631 -0.4608  0.6111 -0.3591 -0.0856 -1.3510 -0.3743 -0.1378  0.8538
+    ## [10]  0.6876  0.2658  0.7393  1.2772  1.7224 -0.3440  0.3404 -0.0509 -2.7539
+    ## [19] -0.4192  1.3120  0.8147  1.5899 -0.4455  0.6647  0.3345 -1.2720  0.3153
+    ## [28] -1.8303 -0.8273 -0.1540
 
 I want a function to compute the z-sxores
 
@@ -35,10 +35,10 @@ z_scores = function(x) {
 z_scores(x_vec)
 ```
 
-    ##  [1] -1.2730  1.3551 -0.1842  0.2376  0.0511 -1.1626 -0.9718  1.0458 -0.5388
-    ## [10]  0.9373 -0.6334  0.7105 -1.3405 -0.4533 -0.0518  0.9151  1.2141 -0.7673
-    ## [19]  0.1402  1.7784  1.0582 -0.8365  1.3809 -1.1224 -0.2421 -1.1595  0.4642
-    ## [28]  1.0744 -1.9997  0.3739
+    ##  [1] -0.6631 -0.4608  0.6111 -0.3591 -0.0856 -1.3510 -0.3743 -0.1378  0.8538
+    ## [10]  0.6876  0.2658  0.7393  1.2772  1.7224 -0.3440  0.3404 -0.0509 -2.7539
+    ## [19] -0.4192  1.3120  0.8147  1.5899 -0.4455  0.6647  0.3345 -1.2720  0.3153
+    ## [28] -1.8303 -0.8273 -0.1540
 
 Try my function o some other things: these should give errors.
 
@@ -76,3 +76,113 @@ z_scores(c(TRUE, TRUE, FALSE, TRUE)) # 0.5, 0.5, 1.5, 0.5
 ``` r
 # Error in z_scores(c(TRUE, TRUE, FALSE, TRUE)) : Input must be numeric
 ```
+
+## Multiple outputs
+
+``` r
+mean_and_sd = function(x) {
+
+   if (!is.numeric(x)) {
+     stop("Input must be numeric")
+   }
+  
+  if (length(x) < 3) {
+    stop("Input must have atleast three numbers") 
+  }
+ 
+  # get both mean and standard deviation 
+  mean_x = mean(x)
+  sd_x = sd(x)
+  
+  # returns the value of mean and standard deviation by list()
+  # list(
+  #   mean = mean_x,
+  #   sd = sd_x
+  # )
+  
+  # return mean and standard deviaiton as a data frame:
+  tibble(
+    mean = mean_x,
+    sd = sd_x
+  )
+  
+  
+  
+}
+```
+
+Check that function works.
+
+``` r
+#x_vec = rnorm(100, mean=3, sd=4)
+mean_and_sd(x_vec)
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  5.64  3.26
+
+## Multiple inputs
+
+I’d like to do this with a function.
+
+``` r
+sim_data = 
+  tibble(
+    x = rnorm(100, mean = 4, sd = 3)
+  )
+
+sim_data %>%
+  summarize(
+   mean = mean(x),
+   sd = sd(x)
+  )
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  4.12  2.96
+
+``` r
+sim_mean_sd = function(samp_size, mu = 3, sigma = 4) {
+  
+  sim_data = 
+  tibble(
+    x = rnorm(n = samp_size, mean = mu, sd = sigma)
+  )
+
+sim_data %>%
+  summarize(
+   mean = mean(x),
+   sd = sd(x)
+  )
+}
+
+#gives the same outputs: overwrite the mu=3, sigma=4 in the parameters
+sim_mean_sd(100,6,3)
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  6.51  3.16
+
+``` r
+sim_mean_sd(samp_size = 100, mu = 6, sigma = 3)
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  5.76  2.60
+
+``` r
+sim_mean_sd(mu = 6, samp_size = 100, sigma = 3)
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  5.71  3.11
