@@ -9,10 +9,10 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec)) / sd(x_vec) # z-scores
 ```
 
-    ##  [1] -0.6631 -0.4608  0.6111 -0.3591 -0.0856 -1.3510 -0.3743 -0.1378  0.8538
-    ## [10]  0.6876  0.2658  0.7393  1.2772  1.7224 -0.3440  0.3404 -0.0509 -2.7539
-    ## [19] -0.4192  1.3120  0.8147  1.5899 -0.4455  0.6647  0.3345 -1.2720  0.3153
-    ## [28] -1.8303 -0.8273 -0.1540
+    ##  [1]  2.4153  2.7043  0.1685 -0.6171 -0.6947  0.5262 -0.0302 -0.0656 -0.0252
+    ## [10] -1.0122  0.5456  0.1219  0.9970 -0.7820  0.0177 -0.7828  1.2063  0.7513
+    ## [19] -0.0536 -1.1764  0.6004 -1.5101 -0.7771 -1.1395 -0.0449  0.7681 -1.4568
+    ## [28]  0.2403 -0.4188 -0.4759
 
 I want a function to compute the z-sxores
 
@@ -35,10 +35,10 @@ z_scores = function(x) {
 z_scores(x_vec)
 ```
 
-    ##  [1] -0.6631 -0.4608  0.6111 -0.3591 -0.0856 -1.3510 -0.3743 -0.1378  0.8538
-    ## [10]  0.6876  0.2658  0.7393  1.2772  1.7224 -0.3440  0.3404 -0.0509 -2.7539
-    ## [19] -0.4192  1.3120  0.8147  1.5899 -0.4455  0.6647  0.3345 -1.2720  0.3153
-    ## [28] -1.8303 -0.8273 -0.1540
+    ##  [1]  2.4153  2.7043  0.1685 -0.6171 -0.6947  0.5262 -0.0302 -0.0656 -0.0252
+    ## [10] -1.0122  0.5456  0.1219  0.9970 -0.7820  0.0177 -0.7828  1.2063  0.7513
+    ## [19] -0.0536 -1.1764  0.6004 -1.5101 -0.7771 -1.1395 -0.0449  0.7681 -1.4568
+    ## [28]  0.2403 -0.4188 -0.4759
 
 Try my function o some other things: these should give errors.
 
@@ -121,7 +121,7 @@ mean_and_sd(x_vec)
     ## # A tibble: 1 x 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.64  3.26
+    ## 1  4.91  3.47
 
 ## Multiple inputs
 
@@ -143,7 +143,7 @@ sim_data %>%
     ## # A tibble: 1 x 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  4.12  2.96
+    ## 1  3.93  2.99
 
 ``` r
 sim_mean_sd = function(samp_size, mu = 3, sigma = 4) {
@@ -167,7 +167,7 @@ sim_mean_sd(100,6,3)
     ## # A tibble: 1 x 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  6.51  3.16
+    ## 1  5.85  3.32
 
 ``` r
 sim_mean_sd(samp_size = 100, mu = 6, sigma = 3)
@@ -176,7 +176,7 @@ sim_mean_sd(samp_size = 100, mu = 6, sigma = 3)
     ## # A tibble: 1 x 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.76  2.60
+    ## 1  5.76  2.77
 
 ``` r
 sim_mean_sd(mu = 6, samp_size = 100, sigma = 3)
@@ -185,4 +185,183 @@ sim_mean_sd(mu = 6, samp_size = 100, sigma = 3)
     ## # A tibble: 1 x 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.71  3.11
+    ## 1  6.63  2.68
+
+Let’s review Napoleon Dynamite
+
+``` r
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes(".a-text-bold span") %>%
+  html_text()
+
+review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text() %>%
+  str_extract("^\\d") %>%
+  as.numeric()
+
+review_text = 
+  dynamite_html %>%
+  html_nodes(".review-text-content span") %>%
+  html_text() %>% 
+  str_replace_all("\n", "") %>% 
+  str_trim()
+
+reviews_page1 = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+
+reviews_page1
+```
+
+    ## # A tibble: 10 x 3
+    ##    title                  stars text                                            
+    ##    <chr>                  <dbl> <chr>                                           
+    ##  1 Vote for Pedro!            5 Just watch the movie. Gosh!                     
+    ##  2 Just watch the freaki~     5 Its a great movie, gosh!!                       
+    ##  3 Great Value                5 Great Value                                     
+    ##  4 I LOVE THIS MOVIE          5 THIS MOVIE IS SO FUNNY ONE OF MY FAVORITES      
+    ##  5 Don't you wish you co~     5 Watch it 100 times. Never. Gets. Old.           
+    ##  6 Stupid, but very funn~     5 If you like stupidly funny '90s teenage movies ~
+    ##  7 The beat                   5 The best                                        
+    ##  8 Hilarious                  5 Super funny! Loved the online rental.           
+    ##  9 Love this movie            5 We love this product.  It came in a timely mann~
+    ## 10 Entertaining, limited~     4 Entertainment level gets a 5 star but having pr~
+
+What about the next page of reviews….
+
+``` r
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes(".a-text-bold span") %>%
+  html_text()
+
+review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text() %>%
+  str_extract("^\\d") %>%
+  as.numeric()
+
+review_text = 
+  dynamite_html %>%
+  html_nodes(".review-text-content span") %>%
+  html_text() %>% 
+  str_replace_all("\n", "") %>% 
+  str_trim()
+
+reviews_page2 = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+reviews_page2
+```
+
+    ## # A tibble: 10 x 3
+    ##    title                               stars text                               
+    ##    <chr>                               <dbl> <chr>                              
+    ##  1 "Boo"                                   1 "We rented this movie because our ~
+    ##  2 "Movie is still silly fun....amazo~     1 "We are getting really frustrated ~
+    ##  3 "Brilliant and awkwardly funny."        5 "I've watched this movie repeatedl~
+    ##  4 "Great purchase price for great mo~     5 "Great movie and real good digital~
+    ##  5 "Movie for memories"                    5 "I've been looking for this movie ~
+    ##  6 "Love!"                                 5 "Love this movie. Great quality"   
+    ##  7 "Hilarious!"                            5 "Such a funny movie, definitely br~
+    ##  8 "napoleon dynamite"                     5 "cool movie"                       
+    ##  9 "Top 5"                                 5 "Best MOVIE ever! Funny one liners~
+    ## 10 "\U0001f44d"                            5 "Exactly as described and came on ~
+
+Let’s turn that codeinto a function
+
+``` r
+read_page_reviews = function(url){
+  
+  html = read_html(url)
+
+  review_titles = 
+    html %>%
+    html_nodes(".a-text-bold span") %>%
+    html_text()
+
+  review_stars = 
+    html %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("^\\d") %>%
+    as.numeric()
+
+  review_text = 
+    html %>%
+    html_nodes(".review-text-content span") %>%
+    html_text() %>% 
+    str_replace_all("\n", "") %>% 
+    str_trim()
+
+  reviews = tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )
+  
+  reviews
+
+}
+```
+
+Let me try my function:
+
+``` r
+dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+
+read_page_reviews(dynamite_url)
+```
+
+    ## # A tibble: 10 x 3
+    ##    title                  stars text                                            
+    ##    <chr>                  <dbl> <chr>                                           
+    ##  1 Vote for Pedro!            5 Just watch the movie. Gosh!                     
+    ##  2 Just watch the freaki~     5 Its a great movie, gosh!!                       
+    ##  3 Great Value                5 Great Value                                     
+    ##  4 I LOVE THIS MOVIE          5 THIS MOVIE IS SO FUNNY ONE OF MY FAVORITES      
+    ##  5 Don't you wish you co~     5 Watch it 100 times. Never. Gets. Old.           
+    ##  6 Stupid, but very funn~     5 If you like stupidly funny '90s teenage movies ~
+    ##  7 The beat                   5 The best                                        
+    ##  8 Hilarious                  5 Super funny! Loved the online rental.           
+    ##  9 Love this movie            5 We love this product.  It came in a timely mann~
+    ## 10 Entertaining, limited~     4 Entertainment level gets a 5 star but having pr~
+
+Let’s read a few pages of reviews:
+
+``` r
+dynamite_url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+
+dynamite_urls = str_c(dynamite_url_base, 1:5)
+
+dynamite_urls[1]
+```
+
+    ## [1] "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+``` r
+all_reviews =  bind_rows(
+  read_page_reviews(dynamite_urls[1]),
+  read_page_reviews(dynamite_urls[2]),
+  read_page_reviews(dynamite_urls[3]),
+  read_page_reviews(dynamite_urls[4]),
+  read_page_reviews(dynamite_urls[5])
+)
+```
